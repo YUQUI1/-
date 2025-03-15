@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日记详情 - 天天日记本</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .detail-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .diary-detail {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(255, 182, 193, 0.3);
+            margin-bottom: 30px;
+            border: 1px solid #ffe6eb;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dotted #ffb6c1;
+            padding-bottom: 10px;
+        }
+        
+        .detail-title {
+            font-size: 1.8em;
+            color: #e84a7f;
+            margin-bottom: 10px;
+        }
+        
+        .detail-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .entry-actions {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .edit-btn, .delete-btn {
+                flex: 1;
+                margin: 0 5px;
+            }
+        }
+        
+        .detail-date, .detail-mood {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .detail-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>天天日记本</h1>
+        
+        <div class="diary-detail">
+            <div class="detail-header">
+                <h2 class="detail-title">{{ entry.title }}</h2>
+                <a href="/diary" class="back-btn">
+                    <button>返回列表</button>
+                </a>
+            </div>
+            
+            <div class="detail-meta">
+                <div class="detail-date">
+                    <span>📅 日期：</span>
+                    <span>{{ entry.date_formatted }}</span>
+                </div>
+                <div class="detail-mood">
+                    <span>😊 心情：</span>
+                    <span class="mood">{{ entry.mood }}</span>
+                </div>
+            </div>
+            
+            <div class="detail-content">{{ entry.content }}</div>
+            
+            {% if entry.tags and entry.tags|length > 0 %}
+            <div class="tags">
+                {% for tag in entry.tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="entry-actions">
+            <button class="edit-btn" onclick="location.href='/?edit={{ entry.id }}';">编辑</button>
+            <button class="delete-btn" onclick="if(confirm('确定要删除这篇日记吗？')) { deleteEntry({{ entry.id }}); }">删除</button>
+        </div>
+    </div>
+    
+    <script>
+    function deleteEntry(id) {
+        fetch(`/api/entries/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.href = '/';
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    </script>
+    <script src="{{ url_for('static', filename='js/detail.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/confetti.js') }}"></script>
+</body>
+</html>
